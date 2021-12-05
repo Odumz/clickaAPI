@@ -1,10 +1,15 @@
-import IClient from '../interfaces/client';
+import IUser from '../interfaces/user';
 import { model, Schema } from 'mongoose';
 import mongoose from 'mongoose';
 
-const ClientSchema: Schema = new Schema(
+const UserSchema: Schema = new Schema(
     {
-        name: {
+        firstname: {
+            type: String,
+            trim: true,
+            required: true
+        },
+        lastname: {
             type: String,
             trim: true,
             required: true
@@ -19,10 +24,10 @@ const ClientSchema: Schema = new Schema(
             type: Number,
             required: true
         },
-        provider: {
-            type: [Schema.Types.ObjectId],
-            required: true,
-            ref: 'provider'
+        password: {
+            type: String,
+            trim: true,
+            required: true
         }
     },
     {
@@ -30,4 +35,4 @@ const ClientSchema: Schema = new Schema(
     }
 );
 
-export default model<IClient>('client', ClientSchema);
+export default model<IUser>('user', UserSchema);

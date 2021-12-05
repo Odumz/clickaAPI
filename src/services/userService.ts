@@ -1,21 +1,21 @@
 import ApiError from '../helpers/ApiError';
 import { Request } from 'express';
-import IClient from 'interfaces/client';
-import Client from '../models/client';
+import IUser from 'interfaces/user';
+import User from '../models/user';
 
 const create = async (req: Request): Promise<void> => {
     try {
         const data = req.body;
 
-        const existingClient = await Client.findOne({ email: data.email });
+        const existingUser = await User.findOne({ email: data.email });
 
-        if (existingClient) {
-            throw new ApiError(409, 'Client with this email exists');
+        if (existingUser) {
+            throw new ApiError(409, 'User with this email exists');
         }
 
-        const client: IClient = await Client.create(data);
+        const user: IUser = await User.create(data);
 
-        return JSON.parse(JSON.stringify(client));
+        return JSON.parse(JSON.stringify(user));
     } catch (err: any) {
         throw new ApiError(err.statusCode || 500, err.message || err);
     }
@@ -30,8 +30,10 @@ const listAll = async (options: any = {}, criteria: any = {}) => {
         if (options.sortBy) {
             const parts = options.sortBy.split(':');
             sorter = parts[1] === 'asc' ? 1 : 'desc' ? -1 : 1;
-            parts[0] === 'name'
-                ? (sortOption = { name: sorter })
+            parts[0] === 'firstname'
+                ? (sortOption = { firstname: sorter })
+                : parts[0] === 'lastname'
+                ? (sortOption = { lastname: sorter })
                 : parts[0] === 'email'
                 ? (sortOption = { email: sorter })
                 : parts[0] === 'phone'
@@ -39,9 +41,14 @@ const listAll = async (options: any = {}, criteria: any = {}) => {
                 : (sortOption = { createdAt: sorter });
         }
 
-        if (criteria.name) {
-            const newQuery = criteria.name.split(',') || [];
-            criteria = { name: { $in: newQuery } };
+        if (criteria.firstname) {
+            const newQuery = criteria.firstname.split(',') || [];
+            criteria = { firstname: { $in: newQuery } };
+        }
+
+        if (criteria.lastname) {
+            const newQuery = criteria.lastname.split(',') || [];
+            criteria = { lastname: { $in: newQuery } };
         }
 
         if (criteria.phone) {
@@ -56,12 +63,11 @@ const listAll = async (options: any = {}, criteria: any = {}) => {
 
         const { sort = sortOption } = options;
 
-        let clients: IClient[] = await Client.find(criteria)
+        let users: IUser[] = await User.find(criteria)
             .sort(sort)
-            .select('name email phone provider')
-            .populate({ path: 'provider', model: 'provider', select: ['_id', 'name'] });
+            .select('firstname lastname email phone');
 
-        return JSON.parse(JSON.stringify(clients));
+        return JSON.parse(JSON.stringify(users));
     } catch (err: any) {
         throw new ApiError(err.statusCode || 500, err.message || err);
     }
@@ -69,45 +75,44 @@ const listAll = async (options: any = {}, criteria: any = {}) => {
 
 const listOne = async (criteria: string): Promise<void> => {
     try {
-        const client: IClient | null = await Client.findById(criteria)
-            .select('name email phone provider')
-            .populate({ path: 'provider', model: 'provider', select: ['_id', 'name'] });
+        const user: IUser | null = await User.findById(criteria)
+            .select('firstname lastname email phone');
 
-        if (!client) {
-            throw new ApiError(404, 'Client not found');
+        if (!user) {
+            throw new ApiError(404, 'User not found');
         }
 
-        return JSON.parse(JSON.stringify(client));
+        return JSON.parse(JSON.stringify(user));
     } catch (error: any) {
         throw new ApiError(error.statusCode || 500, error.message || error);
     }
 };
 
-const edit = async (clientId: string, req: any): Promise<void> => {
+const edit = async (userId: string, req: any): Promise<void> => {
     try {
-        let client: IClient | null = await Client.findByIdAndUpdate(clientId, req.body);
+        let user: IUser | null = await User.findByIdAndUpdate(userId, req.body);
 
-        if (!client) {
-            throw new ApiError(404, 'Client not found');
+        if (!user) {
+            throw new ApiError(404, 'User not found');
         }
 
-        const updatedClient = await Client.findById(client._id);
+        const updatedUser = await User.findById(user._id);
 
-        return JSON.parse(JSON.stringify(updatedClient));
+        return JSON.parse(JSON.stringify(updatedUser));
     } catch (err: any) {
         throw new ApiError(err.statusCode || 500, err.message || err);
     }
 };
 
-const remove = async (clientId: string): Promise<void> => {
+const remove = async (userId: string): Promise<void> => {
     try {
-        let client: IClient | null = await Client.findByIdAndRemove(clientId);
+        let user: IUser | null = await User.findByIdAndRemove(userId);
 
-        if (!client) {
-            throw new ApiError(404, 'Client not found');
+        if (!user) {
+            throw new ApiError(404, 'User not found');
         }
 
-        return JSON.parse(JSON.stringify(client));
+        return JSON.parse(JSON.stringify(user));
     } catch (error: any) {
         throw new ApiError(error.statusCode || 500, error.message || 'error');
     }

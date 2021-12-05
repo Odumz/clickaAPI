@@ -1,7 +1,7 @@
 # Clicka API
 
 ## Overall Objective
-Create restful APIs for a practical test for fullstack javascript developer with experience in Vue, Node.js, Express, MongoDB, and Swagger.
+Create restful APIs for a communications application in Vue, Node.js, Express, MongoDB, and Swagger.
 
 ## Project setup
 
@@ -25,7 +25,7 @@ Run `npm run build` to start the production server.
 Run `npm run test` in the terminal to run the tests.
 
 ## Project links
-- [GitHub](https://github.com/Odumz/clientelleAPI.git)
+- [GitHub](https://github.com/Odumz/clickaAPI.git)
 - [Swagger Documentation](https://clicka.herokuapp.com/api-docs)
 - [Demo](https://clicka.herokuapp.com)
 - [Front-end Demo](https://clicka.vercel.app/)

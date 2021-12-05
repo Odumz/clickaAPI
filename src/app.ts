@@ -60,7 +60,7 @@ app.use('/api/v1', routes);
 
 app.get('/', (req: Request, res: Response): void => {
      res.status(200).json({
-        message: 'Welcome to the Clientelle API built with nodejs, express, and mongodb!'
+        message: 'Welcome to the Clicka API built with nodejs, express, and mongodb!'
     });
 });
 

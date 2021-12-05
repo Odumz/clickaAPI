@@ -1,8 +1,9 @@
 import { Document } from 'mongoose';
 
-export default interface IClient extends Document {
-    name: string;
+export default interface IUser extends Document {
+    firstname: string;
+    lastname: string;
     email: string;
     phone: number;
-    provider: Array<object>;
+    password: string;
 }

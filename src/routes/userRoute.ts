@@ -9,12 +9,12 @@ router.get('/ping', testCheck); // test route
 
 router.get('/all', getAllClients); // get all clients with conditions
 
-router.get('/:id', validate.validate(clientValidation.getClient), getClientByID); // get a client by ID
+router.get('/:id', validate.validate(clientValidation.getUser), getClientByID); // get a client by ID
 
-router.post('/add', validate.validate(clientValidation.addClient), createClient); // add a client to the database
+router.post('/add', validate.validate(clientValidation.addUser), createClient); // add a client to the database
 
-router.put('/edit/:id', validate.validate(clientValidation.editClient), updateClient); // edit a client in the database
+router.put('/edit/:id', validate.validate(clientValidation.editUser), updateClient); // edit a client in the database
 
-router.delete('/delete/:id', validate.validate(clientValidation.deleteClient), deleteClient); // delete a client in the database
+router.delete('/delete/:id', validate.validate(clientValidation.deleteUser), deleteClient); // delete a client in the database
 
 export = router;

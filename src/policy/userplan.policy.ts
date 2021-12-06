@@ -12,7 +12,7 @@ const addUserPlan = {
     body: Joi.object().keys({
         name: Joi.string().min(4).required(),
         features: Joi.array().required(),
-        phone: Joi.number().greater(9).required()
+        price: Joi.number().greater(9).required()
     })
 };
 
@@ -24,7 +24,7 @@ const editUserPlan = {
     body: Joi.object().keys({
         name: Joi.string().min(4),
         features: Joi.array(),
-        phone: Joi.number().greater(9)
+        price: Joi.number().greater(9)
     })
 };
 

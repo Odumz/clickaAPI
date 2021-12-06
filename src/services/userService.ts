@@ -21,7 +21,7 @@ const create = async (req: Request): Promise<void> => {
     }
 };
 
-const listAll = async (options: any = {}, criteria: any = {}) => {
+const listAll = async (options: any = {}, criteria: any = {}): Promise<void> => {
     try {
         let sorter: number = -1;
         let sortOption: any = {};

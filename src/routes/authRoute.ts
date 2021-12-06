@@ -1,20 +1,22 @@
 import { Router } from 'express';
-import { testCheck, getAllClients, createClient, getClientByID, updateClient, deleteClient } from '../controllers/userController';
-import clientValidation from '../policy/user.policy';
-import validate from '../helpers/validate';
+import { testCheck, registerUser, loginUser, forgotPassword, changePassword } from '../controllers/authController';
+import { loginValidator, registrationValidator, changePasswordValidator, forgotPasswordValidator, deleteUser } from '../policy/auth.policy';
+import { validate } from '../helpers/validate';
 
 const router: Router = Router();
 
 router.get('/ping', testCheck); // test route
 
-router.get('/all', getAllClients); // get all clients with conditions
+router.post('/register', validate(registrationValidator), registerUser); // create new user in the application
 
-router.get('/:id', validate.validate(clientValidation.getUser), getClientByID); // get a client by ID
+router.post('/login', validate(loginValidator), loginUser); // log user into the appplication
 
-router.post('/add', validate.validate(clientValidation.addUser), createClient); // add a client to the database
+router.post('/forgot-password', validate(forgotPasswordValidator), forgotPassword); // request token for password change
 
-router.put('/edit/:id', validate.validate(clientValidation.editUser), updateClient); // edit a client in the database
+router.post('/change-password', validate(changePasswordValidator), changePassword); // change user's password 
 
-router.delete('/delete/:id', validate.validate(clientValidation.deleteUser), deleteClient); // delete a client in the database
+router.put('/edit/:id/email', loginUser); // edit a user's email
+
+router.delete('/delete/:id', validate(deleteUser), forgotPassword); // delete a client in the database
 
 export = router;

@@ -23,6 +23,6 @@ const validate = (schema: object) => (req: Request, res: Response, next: NextFun
     return next();
 };
 
-export default {
+export {
     validate
 }

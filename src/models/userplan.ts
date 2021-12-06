@@ -7,6 +7,7 @@ const UserPlanSchema: Schema = new Schema(
         name: {
             type: String,
             trim: true,
+            unique: true,
             minLength: 4,
             required: true
         },

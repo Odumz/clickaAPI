@@ -25,7 +25,7 @@ const MONGO:any = {
     options: MONGO_OPTIONS
 };
 
-const PORT:string | number = process.env.PORT!;
+const PORT:number = parseInt(process.env.PORT!);
 
 const SERVER:any = {
     port: PORT,

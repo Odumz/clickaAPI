@@ -36,7 +36,7 @@ const UserSchema: Schema = new Schema(
         },
         isClickar: {
             type: Boolean,
-            default: 1
+            default: 0
         },
         isAdmin: {
             type: Boolean,

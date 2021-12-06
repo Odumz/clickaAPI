@@ -6,14 +6,14 @@ import pick from '../helpers/pick';
 // test route controller definition
 const testCheck = (req: Request, res: Response) => {
     res.status(200).send({
-        message: 'user plan testCheck'
+        message: 'User plan route testCheck'
     });
 };
 
 // get all userplans with conditions route controller definition
 const getAllUserPlans = catchAsync(async (req: Request, res: Response) => {
     const options = pick(req.query, ['sortBy']);
-    const filter = pick(req.query, ['name', 'email', 'phone']);
+    const filter = pick(req.query, ['name', 'features', 'price']);
     const userplans = await userplanService.listAll(options, filter);
     const count = await userplans.length;
     res.status(200).send({

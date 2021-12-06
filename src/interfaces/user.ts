@@ -6,4 +6,12 @@ export default interface IUser extends Document {
     email: string;
     phone: number;
     password: string;
+    role: string;
+    plan: string;
+    isVerified: boolean;
+    isClickar: boolean;
+    isAdmin: boolean;
+    profileImage: string;
+    isPushNotificationActive: boolean;
+    isSubscribed: boolean;
 }

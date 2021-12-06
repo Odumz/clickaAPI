@@ -21,8 +21,7 @@ const registrationValidator = {
         password: Joi.string()
             .pattern(/^(?=.*\d)(?=.*[!@#\$%\^&\*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/)
             .min(8)
-            .required(),
-        role: Joi.string().valid('admin', 'clickar').required()
+            .required()
     })
 };
 
@@ -35,7 +34,10 @@ const forgotPasswordValidator = {
 
 const changePasswordValidator = {
     body: Joi.object().keys({
-        email: Joi.string().email().required()
+        password: Joi.string()
+            .pattern(/^(?=.*\d)(?=.*[!@#\$%\^&\*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/)
+            .min(8)
+            .required()
     })
 };
 

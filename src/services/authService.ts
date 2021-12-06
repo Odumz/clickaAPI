@@ -2,6 +2,7 @@ import ApiError from '../helpers/ApiError';
 import { Request, RequestHandler } from 'express';
 import IUser from 'interfaces/user';
 import User from '../models/user';
+import bcrypt from 'bcrypt';
 
 const register = async (req: Request): Promise<void> => {
     try {
@@ -13,8 +14,38 @@ const register = async (req: Request): Promise<void> => {
             throw new ApiError(422, 'User with this email exists');
         }
 
-        console.log('new user is: ', data);
+        const hashedPassword = await bcrypt.hash(data.password, 8)
+
+        const newData = {...req.body, password: hashedPassword}
+
+        console.log('new user is: ', newData);
         
+        // const user: IUser = await User.create(data);
+
+        // return JSON.parse(JSON.stringify(user));
+    } catch (err: any) {
+        throw new ApiError(err.statusCode || 500, err.message || err);
+    }
+};
+
+const login = async (req: Request): Promise<void> => {
+    try {
+        const data = req.body;
+
+        // const existingUser = await User.findOne({ email: data.email });
+
+        // if (!existingUser) {
+        //     throw new ApiError(401, 'Email or password is incorrect');
+        // }
+
+        // const isValidPassword = await bcrypt.compare(data.password, existingUser.password);
+
+        // if (!isValidPassword) {
+        //     throw new ApiError(401, 'Email or password is incorrect');
+        // }
+
+        console.log('user is logged in as: ', data);
+
         // const user: IUser = await User.create(data);
 
         // return JSON.parse(JSON.stringify(user));
@@ -101,23 +132,23 @@ const editPassword = async (criteria: string): Promise<void> => {
     }
 };
 
-const login = async (userId: string, req: any): Promise<void> => {
-    try {
-        // let user: IUser | null = await User.findByIdAndUpdate(userId, req.body);
+// const login = async (req: any): Promise<void> => {
+//     try {
+//         // let user: IUser | null = await User.findByIdAndUpdate(userId, req.body);
 
-        // if (!user) {
-        //     throw new ApiError(404, 'User not found');
-        // }
+//         // if (!user) {
+//         //     throw new ApiError(404, 'User not found');
+//         // }
 
-        // const updatedUser = await User.findById(user._id);
+//         // const updatedUser = await User.findById(user._id);
 
-        // return JSON.parse(JSON.stringify(updatedUser));
-        console.log('log in details are: ', req.body);
+//         // return JSON.parse(JSON.stringify(updatedUser));
+//         console.log('log in details are: ', req.body);
         
-    } catch (err: any) {
-        throw new ApiError(err.statusCode || 500, err.message || err);
-    }
-};
+//     } catch (err: any) {
+//         throw new ApiError(err.statusCode || 500, err.message || err);
+//     }
+// };
 
 const remove = async (userId: string): Promise<void> => {
     try {

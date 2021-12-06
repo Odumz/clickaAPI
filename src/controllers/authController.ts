@@ -42,21 +42,21 @@ const changePassword: RequestHandler = catchAsync(async (req: Request, res: Resp
 
 // add a client route controller definition
 const registerUser: RequestHandler = catchAsync(async (req: Request, res: Response) => {
-    const client = await register(req);
+    const newUser = await register(req);
 
     res.status(201).send({
         message: 'User successfully created',
-        client
+        newUser
     });
 });
 
 // update a client route controller definition
 const loginUser: RequestHandler = catchAsync(async (req: Request, res: Response) => {
-    const updatedClient = await login(req.params.id, req);
+    const user = await login(req);
 
     res.status(200).send({
         message: 'User successfully logged in',
-        updatedClient
+        user
     });
 });
 

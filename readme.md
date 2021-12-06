@@ -29,7 +29,7 @@ Run `npm run test` in the terminal to run the tests.
 - [Swagger Documentation](https://clicka.herokuapp.com/api-docs)
 - [Demo](https://clicka.herokuapp.com)
 - [Front-end Demo](https://clicka.vercel.app/)
-- [Postman](https://www.getpostman.com/collections/e10623717c805eca5c0a)
+- [Postman](https://www.getpostman.com/collections/d01055eb12328d0cfc15)
 
 ### How to use the Swagger Documentation
 #### Live Documenation
@@ -44,12 +44,15 @@ Run `npm run test` in the terminal to run the tests.
  - Click on [this link](https://www.postman.com/downloads) to download and install postman for your system if you do not have it already.
  - Open the postman application and click on `Import` to import the postman collection. 
  - Click on `Import` and select the `Link` from the options.
- - Copy [this link](https://www.getpostman.com/collections/e10623717c805eca5c0a) `https://www.getpostman.com/collections/e10623717c805eca5c0a` and paste it in the `Link` field.
+ - Copy [this link](https://www.getpostman.com/collections/d01055eb12328d0cfc15) `https://www.getpostman.com/collections/d01055eb12328d0cfc15` and paste it in the `Link` field.
  - Click on `Continue` to finish import and it will automatically open the postman collection.
 ```
 Postman environment variables:
  {{ URL }} : http://localhost:5000 //or PORT - local url for development
  {{ URL_API }} : http://localhost:5000/api/v1 //or PORT/api/v1 - local api url for development
+ {{ AUTH_API }} : http://localhost:5000/api/v1/auth //or PORT/api/v1/auth - local api url for development
+ {{ USER_API }} : http://localhost:5000/api/v1/user //or PORT/api/v1/user - local api url for development
+ {{ PLANS_API }} : http://localhost:5000/api/v1/userplan //or PORT/api/v1/userplan - local api url for development
  {{ LURL }} : https://clicka.herokuapp.com - live url for development
  {{ LURL_API }} : https://clicka.herokuapp.com/api/v1 - live api url for development
  ```

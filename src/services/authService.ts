@@ -1,11 +1,11 @@
 import ApiError from '../helpers/ApiError';
-import { Request, RequestHandler } from 'express';
+import { Request, Response, RequestHandler } from 'express';
 import IUser from 'interfaces/user';
 import User from '../models/user';
 import bcrypt from 'bcrypt';
 import { createToken, verifyToken } from '../helpers/jwtServices';
 
-const register = async (req: Request): Promise<void> => {
+const register = async (req: Request, res: Response): Promise<void> => {
     try {
         const data = req.body;
 
@@ -17,37 +17,45 @@ const register = async (req: Request): Promise<void> => {
 
         const hashedPassword = await bcrypt.hash(data.password, 8)
 
-        const newData = {...req.body, password: hashedPassword}
+        const newData:any = {...req.body, password: hashedPassword}
         
         const user: IUser = await User.create(newData);
 
-        const token = createToken(user)
+        const token:string = await createToken(user)
 
-        return JSON.parse(JSON.stringify(user));
+        res.cookie('jwt', token)
+        
+        const details:any = await { user, token }
+        
+        return details;
+
+        // return JSON.parse(JSON.stringify(user));
     } catch (err: any) {
         throw new ApiError(err.statusCode || 500, err.message || err);
     }
 };
 
-const login = async (req: Request): Promise<void> => {
+const login = async (req: Request, res: Response): Promise<void> => {
     try {
         const data = req.body;
 
-        // const existingUser = await User.findOne({ email: data.email });
+        const user = await User.findOne({ email: data.email });
 
-        // if (!existingUser) {
-        //     throw new ApiError(401, 'Email or password is incorrect');
-        // }
+        if (!user) {
+            throw new ApiError(401, 'Email or password is incorrect');
+        }
 
-        // const isValidPassword = await bcrypt.compare(data.password, existingUser.password);
+        const isValidPassword = await bcrypt.compare(data.password, user.password);
 
-        // if (!isValidPassword) {
-        //     throw new ApiError(401, 'Email or password is incorrect');
-        // }
+        if (!isValidPassword) {
+            throw new ApiError(401, 'Email or password is incorrect');
+        }
 
-        console.log('user is logged in as: ', data);
+        const token:string = await createToken(user);
 
-        // const user: IUser = await User.create(data);
+        const details:any = await { user, token }
+        
+        return details;
 
         // return JSON.parse(JSON.stringify(user));
     } catch (err: any) {

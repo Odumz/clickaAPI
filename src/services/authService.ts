@@ -3,6 +3,7 @@ import { Request, RequestHandler } from 'express';
 import IUser from 'interfaces/user';
 import User from '../models/user';
 import bcrypt from 'bcrypt';
+import { createToken, verifyToken } from '../helpers/jwtServices';
 
 const register = async (req: Request): Promise<void> => {
     try {
@@ -17,12 +18,12 @@ const register = async (req: Request): Promise<void> => {
         const hashedPassword = await bcrypt.hash(data.password, 8)
 
         const newData = {...req.body, password: hashedPassword}
-
-        console.log('new user is: ', newData);
         
-        // const user: IUser = await User.create(data);
+        const user: IUser = await User.create(newData);
 
-        // return JSON.parse(JSON.stringify(user));
+        const token = createToken(user)
+
+        return JSON.parse(JSON.stringify(user));
     } catch (err: any) {
         throw new ApiError(err.statusCode || 500, err.message || err);
     }

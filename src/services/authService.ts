@@ -3,6 +3,7 @@ import { Request, Response, RequestHandler } from 'express';
 import IUser from 'interfaces/user';
 import User from '../models/user';
 import bcrypt from 'bcrypt';
+import { randomStringGenerator } from '../helpers/filter'
 import { createToken, verifyToken } from '../helpers/jwtServices';
 
 const register = async (req: Request, res: Response): Promise<void> => {
@@ -113,29 +114,49 @@ const listAll = async (options: any = {}, criteria: any = {}): Promise<void> => 
     }
 };
 
-const forgetPassword = async (criteria: string): Promise<void> => {
+const forgetPassword = async (req: Request, res: Response): Promise<void> => {
     try {
-        const user: IUser | null = await User.findById(criteria).select('firstname lastname email phone');
+        const data = req.body;
+
+        // console.log('data', data);
+
+        const user = await User.findOne({ email: data.email });
+
+        // const user: IUser | null = await User.findById(criteria).select('firstname lastname email phone');
 
         if (!user) {
             throw new ApiError(404, 'User not found');
         }
 
-        return JSON.parse(JSON.stringify(user));
+        const passwordResetToken = await randomStringGenerator(35)
+
+        console.log('password reset token is: ', passwordResetToken);
+
+        console.log("You'll get an email at :", data.email);
+
+        // return JSON.parse(JSON.stringify(user));
     } catch (error: any) {
         throw new ApiError(error.statusCode || 500, error.message || error);
     }
 };
 
-const editPassword = async (criteria: string): Promise<void> => {
+const editPassword = async (req: Request, res: Response): Promise<void> => {
     try {
-        const user: IUser | null = await User.findById(criteria).select('firstname lastname email phone');
+        const data = req.body;
 
-        if (!user) {
-            throw new ApiError(404, 'User not found');
-        }
+        console.log('data', data);
 
-        return JSON.parse(JSON.stringify(user));
+        // const user = await User.findOne({ email: data.email });
+
+        // const user: IUser | null = await User.findById(criteria).select('firstname lastname email phone');
+
+        // if (!user) {
+        //     throw new ApiError(404, 'User not found');
+        // }
+
+        console.log("You'll get an email at :", data.email);
+
+        // return JSON.parse(JSON.stringify(user));
     } catch (error: any) {
         throw new ApiError(error.statusCode || 500, error.message || error);
     }

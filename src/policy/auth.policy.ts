@@ -1,6 +1,6 @@
 import Joi from 'joi';
 
-// policy to validate get request for a client
+// policy to validate login request for a user
 const loginValidator = {
     body: Joi.object().keys({
         email: Joi.string().email().required(),
@@ -11,7 +11,7 @@ const loginValidator = {
     })
 };
 
-// policy to validate post request for a client
+// policy to validate registration request for a user
 const registrationValidator = {
     body: Joi.object().keys({
         firstname: Joi.string().min(3).required(),
@@ -25,15 +25,20 @@ const registrationValidator = {
     })
 };
 
-// policy to validate put request for a client
+// policy to validate email for forgot password request for a user
 const forgotPasswordValidator = {
     body: Joi.object().keys({
         email: Joi.string().email().required()
     })
 };
 
+// policy to validate password for change password request for a user
 const changePasswordValidator = {
     body: Joi.object().keys({
+        passwordResetToken: Joi.string()
+            .pattern(/^(?=.*\d)(?=.*[!@#\$%\^&\*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/)
+            .min(35)
+            .required(),
         password: Joi.string()
             .pattern(/^(?=.*\d)(?=.*[!@#\$%\^&\*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/)
             .min(8)

@@ -58,6 +58,15 @@ const UserSchema: Schema = new Schema(
             type: Boolean,
             default: 0
         },
+        passwordResetToken: {
+            type: String,
+            minLength: 35,
+            trim: true
+        },
+        passwordResetExpiry: {
+            type: String,
+            minlength: 2
+        },
         isSubscribed: {
             type: Boolean,
             default: 0

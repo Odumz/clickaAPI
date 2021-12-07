@@ -11,35 +11,6 @@ const testCheck: RequestHandler = (req: Request, res: Response) => {
     });
 };
 
-// get all clients with conditions route controller definition
-const changePassword: RequestHandler = catchAsync(async (req: Request, res: Response) => {
-    const options = pick(req.query, ['sortBy']);
-    const filter = pick(req.query, ['name', 'email', 'phone']);
-    const clients: any = await listAll(options, filter);
-    const count = await clients.length;
-    res.status(200).send({
-        status: 'success',
-        message: 'Clients successfully fetched',
-        data: {
-            count,
-            clients
-        }
-    });
-});
-
-// get client by ID route controller definition
-// const getClientByID: RequestHandler = catchAsync(async (req: Request, res: Response) => {
-//     const client = await listOne(req.params.id);
-
-//     res.status(200).send({
-//         status: 'success',
-//         message: 'User successfully fetched',
-//         data: {
-//             client
-//         }
-//     });
-// });
-
 // add a client route controller definition
 const registerUser: RequestHandler = catchAsync(async (req: Request, res: Response) => {
     const user:any = await register(req, res);
@@ -60,12 +31,52 @@ const loginUser: RequestHandler = catchAsync(async (req: Request, res: Response)
     });
 });
 
-// delete a client route controller definition
-const forgotPassword: RequestHandler = catchAsync(async (req: Request, res: Response) => {
-    const deletedClient = await forgetPassword(req.body);
+// update a client route controller definition
+const changePassword: RequestHandler = catchAsync(async (req: Request, res: Response) => {
+    const user:any = await editPassword(req, res);
 
     res.status(200).send({
-        message: 'Client successfully deleted'
+        message: 'User successfully logged in',
+        ...user
+    });
+});
+
+// get all clients with conditions route controller definition
+// const changePassword: RequestHandler = catchAsync(async (req: Request, res: Response) => {
+//     // const options = pick(req.query, ['sortBy']);
+//     // const filter = pick(req.query, ['name', 'email', 'phone']);
+//     const clients: any = await listAll(req.body);
+//     const count = await clients.length;
+//     res.status(200).send({
+//         status: 'success',
+//         message: 'Clients successfully fetched',
+//         data: {
+//             count,
+//             clients
+//         }
+//     });
+// });
+
+// get client by ID route controller definition
+// const getClientByID: RequestHandler = catchAsync(async (req: Request, res: Response) => {
+//     const client = await listOne(req.params.id);
+
+//     res.status(200).send({
+//         status: 'success',
+//         message: 'User successfully fetched',
+//         data: {
+//             client
+//         }
+//     });
+// });
+
+// delete a client route controller definition
+const forgotPassword: RequestHandler = catchAsync(async (req: Request, res: Response) => {
+    const user: any = await forgetPassword(req, res);
+
+    res.status(200).send({
+        message: 'Client successfully deleted',
+        user
     });
 });
 

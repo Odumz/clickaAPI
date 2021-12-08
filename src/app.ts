@@ -7,6 +7,9 @@ import db from './config/db'
 import cors from 'cors'
 import YAML from 'yamljs';
 import swaggerUI from 'swagger-ui-express';
+import passport from 'passport';
+import kPassport from './middleware/passport'
+import cookieParser from 'cookie-parser';
 
 const NAMESPACE = 'api';
 const app = express();
@@ -41,6 +44,13 @@ app.use(cors(options));
 // parse the request body
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// passport jwt
+app.use(passport.initialize())
+kPassport(passport)
+
+// cookie-parser
+app.use(cookieParser())
 
 // rules of the api
 app.use((req: Request, res: Response, next: NextFunction) => {

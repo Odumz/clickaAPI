@@ -54,9 +54,13 @@ const login = async (req: Request, res: Response): Promise<void> => {
 
         const token:string = await createToken(user);
 
+        res.cookie('jwt', token);
+
         const details:any = await { user, token }
+        console.log(details);
         
         return details;
+        // res.send(details);
 
         // return JSON.parse(JSON.stringify(user));
     } catch (err: any) {

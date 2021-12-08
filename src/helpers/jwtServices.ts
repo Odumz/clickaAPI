@@ -25,7 +25,7 @@ const createToken = async (user: any) => {
             `${JWTSECRET}`,
             { expiresIn: JWTEXPIRY }
         );
-        console.log('token here is: ', token);
+        // console.log('token here is: ', token);
         return token;
     } catch (error) {
         // console.log(error.name);

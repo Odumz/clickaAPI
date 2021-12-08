@@ -3,8 +3,8 @@ import ApiError from './ApiError';
 import pick from './pick'
 import { Request, Response, NextFunction } from 'express'
 
-const validate = (schema: object) => (req: Request, res: Response, next: NextFunction) => {
-    const validSchema = pick(schema, ["params", 'query', "body", 'headers']);
+export const validate = (schema: object) => (req: Request, res: Response, next: NextFunction) => {
+    const validSchema = pick(schema, ['params', 'query', 'body', 'headers', 'cookies']);
     const object = pick(req, Object.keys(validSchema));
 
     const { value, error } = Joi.compile(validSchema)
@@ -22,7 +22,3 @@ const validate = (schema: object) => (req: Request, res: Response, next: NextFun
     Object.assign(req, value)
     return next();
 };
-
-export {
-    validate
-}

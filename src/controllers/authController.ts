@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, RequestHandler } from 'express';
-import { register, login, listAll, forgetPassword, editPassword, remove } from '../services/authService';
+import { register, login, forgetPassword, editPassword } from '../services/authService';
 import catchAsync from '../helpers/catchAsync';
 import pick from '../helpers/pick';
 import { registrationValidator } from 'policy/auth.policy';
@@ -40,35 +40,6 @@ const changePassword: RequestHandler = catchAsync(async (req: Request, res: Resp
         ...user
     });
 });
-
-// get all clients with conditions route controller definition
-// const changePassword: RequestHandler = catchAsync(async (req: Request, res: Response) => {
-//     // const options = pick(req.query, ['sortBy']);
-//     // const filter = pick(req.query, ['name', 'email', 'phone']);
-//     const clients: any = await listAll(req.body);
-//     const count = await clients.length;
-//     res.status(200).send({
-//         status: 'success',
-//         message: 'Clients successfully fetched',
-//         data: {
-//             count,
-//             clients
-//         }
-//     });
-// });
-
-// get client by ID route controller definition
-// const getClientByID: RequestHandler = catchAsync(async (req: Request, res: Response) => {
-//     const client = await listOne(req.params.id);
-
-//     res.status(200).send({
-//         status: 'success',
-//         message: 'User successfully fetched',
-//         data: {
-//             client
-//         }
-//     });
-// });
 
 // delete a client route controller definition
 const forgotPassword: RequestHandler = catchAsync(async (req: Request, res: Response) => {

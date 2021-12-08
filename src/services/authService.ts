@@ -5,8 +5,10 @@ import User from '../models/user';
 import bcrypt from 'bcrypt';
 import { randomStringGenerator } from '../helpers/filter'
 import { createToken, verifyToken } from '../helpers/jwtServices';
+import { transporter, FRONTENDURL } from 'config/config';
+import nodemailer from 'nodemailer'
 
-const register = async (req: Request, res: Response): Promise<void> => {
+export const register = async (req: Request, res: Response): Promise<void> => {
     try {
         const data = req.body;
 
@@ -36,7 +38,7 @@ const register = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
-const login = async (req: Request, res: Response): Promise<void> => {
+export const login = async (req: Request, res: Response): Promise<void> => {
     try {
         const data = req.body;
 
@@ -68,57 +70,7 @@ const login = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
-const listAll = async (options: any = {}, criteria: any = {}): Promise<void> => {
-    try {
-        let sorter: number = -1;
-        let sortOption: any = {};
-
-        // sort results with sort option
-        if (options.sortBy) {
-            const parts = options.sortBy.split(':');
-            sorter = parts[1] === 'asc' ? 1 : 'desc' ? -1 : 1;
-            parts[0] === 'firstname'
-                ? (sortOption = { firstname: sorter })
-                : parts[0] === 'lastname'
-                ? (sortOption = { lastname: sorter })
-                : parts[0] === 'email'
-                ? (sortOption = { email: sorter })
-                : parts[0] === 'phone'
-                ? (sortOption = { phone: sorter })
-                : (sortOption = { createdAt: sorter });
-        }
-
-        if (criteria.firstname) {
-            const newQuery = criteria.firstname.split(',') || [];
-            criteria = { firstname: { $in: newQuery } };
-        }
-
-        if (criteria.lastname) {
-            const newQuery = criteria.lastname.split(',') || [];
-            criteria = { lastname: { $in: newQuery } };
-        }
-
-        if (criteria.phone) {
-            const newQuery = criteria.phone.split(',') || [];
-            criteria = { phone: { $in: newQuery } };
-        }
-
-        if (criteria.email) {
-            const newQuery = criteria.email.split(',') || [];
-            criteria = { email: { $in: newQuery } };
-        }
-
-        const { sort = sortOption } = options;
-
-        let users: IUser[] = await User.find(criteria).sort(sort).select('firstname lastname email phone');
-
-        return JSON.parse(JSON.stringify(users));
-    } catch (err: any) {
-        throw new ApiError(err.statusCode || 500, err.message || err);
-    }
-};
-
-const forgetPassword = async (req: Request, res: Response): Promise<void> => {
+export const forgetPassword = async (req: Request, res: Response): Promise<void> => {
     try {
         const data = req.body;
 
@@ -144,7 +96,7 @@ const forgetPassword = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
-const editPassword = async (req: Request, res: Response): Promise<void> => {
+export const editPassword = async (req: Request, res: Response): Promise<void> => {
     try {
         const data = req.body;
 
@@ -166,25 +118,7 @@ const editPassword = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
-// const login = async (req: any): Promise<void> => {
-//     try {
-//         // let user: IUser | null = await User.findByIdAndUpdate(userId, req.body);
-
-//         // if (!user) {
-//         //     throw new ApiError(404, 'User not found');
-//         // }
-
-//         // const updatedUser = await User.findById(user._id);
-
-//         // return JSON.parse(JSON.stringify(updatedUser));
-//         console.log('log in details are: ', req.body);
-        
-//     } catch (err: any) {
-//         throw new ApiError(err.statusCode || 500, err.message || err);
-//     }
-// };
-
-const remove = async (userId: string): Promise<void> => {
+export const remove = async (userId: string): Promise<void> => {
     try {
         let user: IUser | null = await User.findByIdAndRemove(userId);
 
@@ -198,11 +132,115 @@ const remove = async (userId: string): Promise<void> => {
     }
 };
 
-export {
-    register,
-    login,
-    listAll,
-    forgetPassword,
-    editPassword,
-    remove
+export const sendVerificationMail: RequestHandler = async (req, res, next) => {
+    const data = req.body;
+    try {
+        const user: IUser | null = await User.findOne({ email: data.email });
+
+        if (!user) {
+            throw new ApiError(404, 'User not found');
+        }
+
+        if (user.isVerified) {
+            throw new ApiError(406, 'User already verified');
+        }
+
+        const encryptedToken = await bcrypt.hash(user.id.toString(), 8);
+
+        const token: string = await createToken(user.id, '60m');
+
+        let info = await transporter.sendMail({
+            from: '"Fred Foo 👻" <anshuraj@dosomecoding.com>', // sender address
+            to: `${user.email}`, // list of receivers
+            subject: 'For Email Verification', // Subject line
+            // text: "Hello world?", // plain text body
+            html: `Your Verification Link <a href="${FRONTENDURL}/email-verify/${token}">Link</a>` // html body
+        });
+
+        // console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+
+        await user.updateOne({ $set: { verifyToken: encryptedToken } });
+        res.json({
+            message: `Preview URL: %s ${nodemailer.getTestMessageUrl(info)}`
+        });
+    } catch (error: any) {
+        throw new ApiError(error.statusCode || 500, error.message || error);
+    }
+};
+
+export const verifyUserMail: RequestHandler = async (req, res, next) => {
+    const { token }: { token: string } = req.body;
+
+    try {
+        const decodedToken: any = verifyToken(token);
+
+        const user = await User.findById(decodedToken.userId);
+        if (!user) {
+            throw new ApiError(401, 'Token is invalid');
+        }
+
+        await user.updateOne({
+            $set: { isUserVerified: true },
+            $unset: { verifyToken: 0 }
+        });
+
+        res.json({ message: 'Email Verified!' });
+    } catch (error) {
+        throw new ApiError(401, 'Token is invalid');
+    }
+};
+
+export const sendForgotPasswordMail: RequestHandler = async (req, res, next) => {
+    const { email }: { email: string } = req.body;
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            throw new ApiError(404, 'Email is not valid');
+        }
+
+        const encryptedToken = await bcrypt.hash(user._id.toString(), 8);
+
+        const token: string = await createToken(user.id, '60m');
+
+        let info = await transporter.sendMail({
+            from: '"Fred Foo 👻" <anshuraj@dosomecoding.com>', // sender address
+            to: `${email}`, // list of receivers
+            subject: 'For Forgot Password Verification Mail', // Subject line
+            // text: "Hello world?", // plain text body
+            html: `Your Verification for forgot password Link <a href="${FRONTENDURL}/forgot-password-verify/${token}">Link</a>` // html body
+        });
+
+        // console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+
+        await user.updateOne({ $set: { verifyToken: encryptedToken } });
+
+        res.json({
+            message: `Preview URL: %s ${nodemailer.getTestMessageUrl(info)}`
+        });
+    } catch (error: any) {
+        throw new ApiError(error.statusCode || 500, error.message || error);
+    }
+};
+export const verifyForgotMail: RequestHandler = async (req, res, next) => {
+    const { token, password }: { token: string; password: string } = req.body;
+
+    try {
+        const decodedToken: any = verifyToken(token);
+
+        const user = await User.findById(decodedToken.userId);
+        if (!user) {
+            throw new ApiError(401, 'Token is invalid');
+        }
+
+        const encryptedPassword = await bcrypt.hash(password, 8);
+
+        await user.updateOne({
+            $set: { password: encryptedPassword },
+            $unset: { verifyToken: 0 }
+        });
+
+        res.json({ message: 'Password Changed!' });
+    } catch (error) {
+        throw new ApiError(401, 'Token is invalid');
+    }
 };

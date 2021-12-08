@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import nodemailer from 'nodemailer';
 
 dotenv.config();
 
@@ -32,9 +33,21 @@ const SERVER:any = {
     mongo: MONGO_URI
 };
 
-const config:any = {
+export const config:any = {
     mongo: MONGO,
     server: SERVER
 };
 
-export default config;
+const mailerAccount:any = nodemailer.createTestAccount();
+
+export const transporter = nodemailer.createTransport({
+    host: 'smtp.ethereal.email',
+    port: 587,
+    secure: false, // true for 465, false for others
+    auth: {
+        user: mailerAccount.user,
+        pass: mailerAccount.pass
+    }
+});
+
+export const FRONTENDURL = process.env.FRONTENDURL;

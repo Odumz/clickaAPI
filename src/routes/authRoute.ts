@@ -14,6 +14,8 @@ router.post('/login', authChecker, validate(loginValidator), loginUser); // log 
 
 router.post('/forgot-password', validate(forgotPasswordValidator), forgotPassword); // request token for password change
 
+router.post('/verify-email', validate(forgotPasswordValidator), forgotPassword); // request token for password change
+
 router.post('/change-password', validate(changePasswordValidator), changePassword); // change user's password 
 
 router.put('/edit/:id/email', loginUser); // edit a user's email

@@ -11,7 +11,7 @@ const { JWTSECRET, JWTEXPIRY } = process.env;
 
 // for the token creation and verification
 // creates token for user
-const createToken = async (user: any) => {
+const createToken = async (user: any, expires: string = `${JWTEXPIRY}`) => {
     try {
         let token = jwt.sign(
             {
@@ -23,7 +23,7 @@ const createToken = async (user: any) => {
                 role: user.role
             },
             `${JWTSECRET}`,
-            { expiresIn: JWTEXPIRY }
+            { expiresIn: expires }
         );
         // console.log('token here is: ', token);
         return token;

@@ -45,7 +45,7 @@ const verifyUserEmail = {
 // policy to validate password for change password request for a user
 const changePasswordValidator = {
     body: Joi.object().keys({
-        passwordResetToken: Joi.string()
+        token: Joi.string()
             .pattern(/^(?=.*\d)(?=.*[!@#\$%\^&\*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/)
             .min(35)
             .required(),

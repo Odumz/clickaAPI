@@ -38,6 +38,10 @@ export const config:any = {
     server: SERVER
 };
 
+export const NODEMAILER_USER = process.env.NODEMAILER_USER;
+
+export const NODEMAILER_PWD = process.env.NODEMAILER_PWD;
+
 const mailerAccount:any = nodemailer.createTestAccount();
 
 export const transporter = nodemailer.createTransport({
@@ -45,8 +49,8 @@ export const transporter = nodemailer.createTransport({
     port: 587,
     secure: false, // true for 465, false for others
     auth: {
-        user: mailerAccount.user,
-        pass: mailerAccount.pass
+        user: NODEMAILER_USER,
+        pass: NODEMAILER_PWD
     }
 });
 

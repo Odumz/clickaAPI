@@ -1,12 +1,12 @@
 import ApiError from '../helpers/ApiError';
-import { Request, Response, RequestHandler } from 'express';
+import { Request, Response } from 'express';
 import IUser from 'interfaces/user';
 import User from '../models/user';
 import bcrypt from 'bcrypt';
-import { randomStringGenerator } from '../helpers/filter'
+import { randomStringGenerator } from '../helpers/filter';
 import { createToken, verifyToken } from '../helpers/jwtServices';
-import { transporter, FRONTENDURL } from 'config/config';
-import nodemailer from 'nodemailer'
+import { transporter, FRONTENDURL } from '../config/config';
+import nodemailer from 'nodemailer';
 
 export const register = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -18,21 +18,23 @@ export const register = async (req: Request, res: Response): Promise<void> => {
             throw new ApiError(422, 'User with this email exists');
         }
 
-        const hashedPassword = await bcrypt.hash(data.password, 8)
+        const hashedPassword = await bcrypt.hash(data.password, 8);
 
-        const newData:any = {...req.body, password: hashedPassword}
-        
+        const newData: any = { ...req.body, password: hashedPassword };
+
         const user: IUser = await User.create(newData);
 
-        const token:string = await createToken(user)
+        // const token: string = await createToken(user);
 
-        res.cookie('jwt', token)
-        
-        const details:any = await { user, token }
-        
-        return details;
+        // res.cookie('jwt', token);
 
-        // return JSON.parse(JSON.stringify(user));
+        // const details: any = await { user, token };
+
+        // return details;
+
+        // return user: IUser
+
+        return JSON.parse(JSON.stringify(user));
     } catch (err: any) {
         throw new ApiError(err.statusCode || 500, err.message || err);
     }
@@ -54,13 +56,21 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             throw new ApiError(401, 'Email or password is incorrect');
         }
 
-        const token:string = await createToken(user);
+        let userData = {
+            id: user._id,
+            phone: user.phone,
+            lastname: user.lastname,
+            firstname: user.firstname,
+            email: user.email,
+            role: user.role
+        };
+
+        const token: string = await createToken(userData);
 
         res.cookie('jwt', token);
 
-        const details:any = await { user, token }
-        console.log(details);
-        
+        const details: any = await { user, token };        
+
         return details;
         // res.send(details);
 
@@ -74,7 +84,7 @@ export const forgetPassword = async (req: Request, res: Response): Promise<void>
     try {
         const data = req.body;
 
-        // console.log('data', data);
+    // 
 
         const user = await User.findOne({ email: data.email });
 
@@ -84,11 +94,9 @@ export const forgetPassword = async (req: Request, res: Response): Promise<void>
             throw new ApiError(404, 'User not found');
         }
 
-        const passwordResetToken = await randomStringGenerator(35)
-
-        console.log('password reset token is: ', passwordResetToken);
-
-        console.log("You'll get an email at :", data.email);
+        const token = await randomStringGenerator(35);
+        
+        
 
         // return JSON.parse(JSON.stringify(user));
     } catch (error: any) {
@@ -99,8 +107,7 @@ export const forgetPassword = async (req: Request, res: Response): Promise<void>
 export const editPassword = async (req: Request, res: Response): Promise<void> => {
     try {
         const data = req.body;
-
-        console.log('data', data);
+        
 
         // const user = await User.findOne({ email: data.email });
 
@@ -109,8 +116,7 @@ export const editPassword = async (req: Request, res: Response): Promise<void> =
         // if (!user) {
         //     throw new ApiError(404, 'User not found');
         // }
-
-        console.log("You'll get an email at :", data.email);
+        
 
         // return JSON.parse(JSON.stringify(user));
     } catch (error: any) {
@@ -132,12 +138,14 @@ export const remove = async (userId: string): Promise<void> => {
     }
 };
 
-export const sendVerificationMail: RequestHandler = async (req, res, next) => {
-    const data = req.body;
-    try {
-        const user: IUser | null = await User.findOne({ email: data.email });
-
-        if (!user) {
+export const sendVerificationMail = async (req: Request, res: Response) => {
+    try {        
+        
+        const data: any = req.body;        
+        
+        const user: IUser | null = await User.findOne({ email: data.email });        
+        
+        if (!user) {    
             throw new ApiError(404, 'User not found');
         }
 
@@ -145,52 +153,63 @@ export const sendVerificationMail: RequestHandler = async (req, res, next) => {
             throw new ApiError(406, 'User already verified');
         }
 
-        const encryptedToken = await bcrypt.hash(user.id.toString(), 8);
-
-        const token: string = await createToken(user.id, '60m');
-
+        const encryptedToken = await bcrypt.hash(user._id.toString(), 8);    
+        
+        const jwttoken = await createToken(user._id, '60m');
+        
         let info = await transporter.sendMail({
-            from: '"Fred Foo 👻" <anshuraj@dosomecoding.com>', // sender address
+            from: '"Clicka App 👻" <clicka@soft.com>', // sender address
             to: `${user.email}`, // list of receivers
             subject: 'For Email Verification', // Subject line
             // text: "Hello world?", // plain text body
-            html: `Your Verification Link <a href="${FRONTENDURL}/email-verify/${token}">Link</a>` // html body
+            html: `Your Verification Link <a href="${FRONTENDURL}/email-verify/${jwttoken}">Link</a>` // html body
         });
 
-        // console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+        await user.updateOne({ $set: { token: encryptedToken } });     
 
-        await user.updateOne({ $set: { verifyToken: encryptedToken } });
-        res.json({
-            message: `Preview URL: %s ${nodemailer.getTestMessageUrl(info)}`
-        });
+        const email:string = `Preview URL: %s ${nodemailer.getTestMessageUrl(info)}`
+        console.log('message is: ', email);
+
+        return email;
+        
+        // return JSON.parse(JSON.stringify(user));
+        // res.json({
+        //     message: `Preview URL: %s ${nodemailer.getTestMessageUrl(info)}`
+        // });
     } catch (error: any) {
         throw new ApiError(error.statusCode || 500, error.message || error);
     }
 };
 
-export const verifyUserMail: RequestHandler = async (req, res, next) => {
-    const { token }: { token: string } = req.body;
-
+export const verifyUserMail = async (req:Request, res:Response) => {
     try {
-        const decodedToken: any = verifyToken(token);
+        const data:any = req.body;
+        console.log('data is: ', data);
+        
+        const decodedToken: any = await verifyToken(data.token);
+        console.log('i will work');
+        console.log('decodedToken is: ', decodedToken);
+        const user = await User.findById(decodedToken.data.id);
+        console.log('user is: ', user);
+        
 
-        const user = await User.findById(decodedToken.userId);
         if (!user) {
             throw new ApiError(401, 'Token is invalid');
         }
 
         await user.updateOne({
-            $set: { isUserVerified: true },
-            $unset: { verifyToken: 0 }
+            $set: { isVerified: true },
+            $unset: { token: 0 }
         });
 
-        res.json({ message: 'Email Verified!' });
+        // res.json({ message: 'Email Verified!' });
+        let message: 'Email Verified!';
     } catch (error) {
         throw new ApiError(401, 'Token is invalid');
     }
 };
 
-export const sendForgotPasswordMail: RequestHandler = async (req, res, next) => {
+export const sendForgotPasswordMail = async (req:Request, res:Response) => {
     const { email }: { email: string } = req.body;
     try {
         const user = await User.findOne({ email });
@@ -210,8 +229,6 @@ export const sendForgotPasswordMail: RequestHandler = async (req, res, next) => 
             html: `Your Verification for forgot password Link <a href="${FRONTENDURL}/forgot-password-verify/${token}">Link</a>` // html body
         });
 
-        // console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-
         await user.updateOne({ $set: { verifyToken: encryptedToken } });
 
         res.json({
@@ -221,7 +238,7 @@ export const sendForgotPasswordMail: RequestHandler = async (req, res, next) => 
         throw new ApiError(error.statusCode || 500, error.message || error);
     }
 };
-export const verifyForgotMail: RequestHandler = async (req, res, next) => {
+export const verifyForgotMail = async (req:Request, res:Response) => {
     const { token, password }: { token: string; password: string } = req.body;
 
     try {

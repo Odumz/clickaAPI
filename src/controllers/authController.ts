@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction, RequestHandler } from 'express';
-import { register, login, forgetPassword, editPassword } from '../services/authService';
+import { register, login, forgetPassword, editPassword, sendVerificationMail, verifyUserMail } from '../services/authService';
 import catchAsync from '../helpers/catchAsync';
 import pick from '../helpers/pick';
-import { registrationValidator } from 'policy/auth.policy';
 
 // test route controller definition
 const testCheck: RequestHandler = (req: Request, res: Response) => {
@@ -51,4 +50,24 @@ const forgotPassword: RequestHandler = catchAsync(async (req: Request, res: Resp
     });
 });
 
-export { testCheck, changePassword, registerUser, loginUser, forgotPassword };
+// send email verification controller definition
+const sendMailVerification: RequestHandler = catchAsync(async (req: Request, res: Response) => {
+    const user: any = await sendVerificationMail(req, res);
+
+    res.status(200).send({
+        message: 'Verification email successfully sent',
+        user
+    });
+});
+
+// send email verification controller definition
+const mailVerification: RequestHandler = catchAsync(async (req: Request, res: Response) => {
+    const user: any = await verifyUserMail(req, res);
+
+    res.status(200).send({
+        message: 'User email successfully verified',
+        user
+    });
+});
+
+export { testCheck, changePassword, registerUser, loginUser, forgotPassword, sendMailVerification, mailVerification };

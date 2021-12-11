@@ -14,6 +14,5 @@ export default interface IUser extends Document {
     profileImage: string;
     isPushNotificationActive: boolean;
     isSubscribed: boolean;
-    passwordResetToken: string;
-    passwordResetExpiry: string;
+    token: string;
 }

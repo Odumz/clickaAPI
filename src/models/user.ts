@@ -59,8 +59,7 @@ const UserSchema: Schema = new Schema(
             default: 0
         },
         token: {
-            type: String,
-            minLength: 35
+            type: String
         },
         isSubscribed: {
             type: Boolean,

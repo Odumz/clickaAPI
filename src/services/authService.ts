@@ -153,9 +153,18 @@ export const sendVerificationMail = async (req: Request, res: Response) => {
             throw new ApiError(406, 'User already verified');
         }
 
-        const encryptedToken = await bcrypt.hash(user._id.toString(), 8);    
+        const encryptedToken = await bcrypt.hash(user._id.toString(), 8);          
+
+        let userData = {
+            id: user._id,
+            firstname: user.firstname,
+            lastname: user.lastname,
+            email: user.email
+        };  
         
-        const jwttoken = await createToken(user._id, '60m');
+        const jwttoken = await createToken(user.id, '60m');
+
+        console.log('token is: ', jwttoken);
         
         let info = await transporter.sendMail({
             from: '"Clicka App 👻" <clicka@soft.com>', // sender address
@@ -189,7 +198,7 @@ export const verifyUserMail = async (req:Request, res:Response) => {
         const decodedToken: any = await verifyToken(data.token);
         console.log('i will work');
         console.log('decodedToken is: ', decodedToken);
-        const user = await User.findById(decodedToken.data.id);
+        const user = await User.findById(decodedToken.data);
         console.log('user is: ', user);
         
 
@@ -219,7 +228,7 @@ export const sendForgotPasswordMail = async (req:Request, res:Response) => {
 
         const encryptedToken = await bcrypt.hash(user._id.toString(), 8);
 
-        const token: string = await createToken(user.id, '60m');
+        const token: string = await createToken(user.id, '60m');        
 
         let info = await transporter.sendMail({
             from: '"Fred Foo 👻" <anshuraj@dosomecoding.com>', // sender address

@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { testCheck, registerUser, loginUser, forgotPassword, changePassword, sendMailVerification, mailVerification } from '../controllers/authController';
-import { loginValidator, registrationValidator, changePasswordValidator, forgotPasswordValidator, deleteUser } from '../policy/auth.policy';
+import { testCheck, registerUser, loginUser, forgotPassword, sendForgotPasswordVerification, ForgotPasswordVerification, changePassword, sendMailVerification, mailVerification } from '../controllers/authController';
+import { loginValidator, registrationValidator, tokenValidator, emailValidator, deleteUser, changePasswordValidator } from '../policy/auth.policy';
 import { validate } from '../helpers/validate';
 import { authChecker } from '../middleware/authChecker'
 
@@ -12,13 +12,13 @@ router.post('/register', validate(registrationValidator), registerUser); // crea
 
 router.post('/login', validate(loginValidator), loginUser); // log user into the appplication
 
-router.post('/forgot-password', validate(forgotPasswordValidator), forgotPassword); // request token for password change
+router.post('/forgot-password', validate(emailValidator), sendForgotPasswordVerification); // request token for password change
 
-router.post('/send-verification-email', validate(forgotPasswordValidator), sendMailVerification); // request token for password change
+router.post('/send-verification-email', validate(emailValidator), sendMailVerification); // request token for password change
 
-router.post('/verify-email', mailVerification); // request token for password change
+router.post('/verify-email', validate(tokenValidator), mailVerification); // request token for password change
 
-router.post('/change-password', validate(changePasswordValidator), changePassword); // change user's password 
+router.post('/change-password', validate(changePasswordValidator), ForgotPasswordVerification); // change user's password 
 
 router.put('/edit/:id/email', loginUser); // edit a user's email
 

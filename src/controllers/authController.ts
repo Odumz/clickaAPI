@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, RequestHandler } from 'express';
-import { register, login, forgetPassword, editPassword, sendVerificationMail, verifyUserMail } from '../services/authService';
+import { register, login, forgetPassword, editPassword, sendVerificationMail, verifyUserMail, sendForgotPasswordVerificationMail, verifyForgotPassword } from '../services/authService';
 import catchAsync from '../helpers/catchAsync';
 import pick from '../helpers/pick';
 
@@ -52,11 +52,11 @@ const forgotPassword: RequestHandler = catchAsync(async (req: Request, res: Resp
 
 // send email verification controller definition
 const sendMailVerification: RequestHandler = catchAsync(async (req: Request, res: Response) => {
-    const user: any = await sendVerificationMail(req, res);
+    const email: any = await sendVerificationMail(req, res);
 
     res.status(200).send({
         message: 'Verification email successfully sent',
-        user
+        email
     });
 });
 
@@ -65,9 +65,27 @@ const mailVerification: RequestHandler = catchAsync(async (req: Request, res: Re
     const user: any = await verifyUserMail(req, res);
 
     res.status(200).send({
-        message: 'User email successfully verified',
-        user
+        message: 'User email successfully verified'
     });
 });
 
-export { testCheck, changePassword, registerUser, loginUser, forgotPassword, sendMailVerification, mailVerification };
+// send email verification controller definition
+const sendForgotPasswordVerification: RequestHandler = catchAsync(async (req: Request, res: Response) => {
+    const email: any = await sendForgotPasswordVerificationMail(req, res);
+
+    res.status(200).send({
+        message: 'Forgot password verification email successfully sent',
+        email
+    });
+});
+
+// send email verification controller definition
+const ForgotPasswordVerification: RequestHandler = catchAsync(async (req: Request, res: Response) => {
+    const user: any = await verifyForgotPassword(req, res);
+
+    res.status(200).send({
+        message: 'User password successfully updated'
+    });
+});
+
+export { testCheck, changePassword, registerUser, loginUser, forgotPassword, sendMailVerification, mailVerification, sendForgotPasswordVerification, ForgotPasswordVerification };

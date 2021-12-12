@@ -26,29 +26,23 @@ const registrationValidator = {
 };
 
 // policy to validate email for forgot password request for a user
-const forgotPasswordValidator = {
+const emailValidator = {
     body: Joi.object().keys({
         email: Joi.string().email().required()
     })
 };
 
 // policy to verify user email
-const verifyUserEmail = {
+const tokenValidator = {
     body: Joi.object().keys({
-        token: Joi.string()
-            .pattern(/^(?=.*\d)(?=.*[!@#\$%\^&\*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/)
-            .min(35)
-            .required()
+        token: Joi.string().required()
     })
 };
 
 // policy to validate password for change password request for a user
 const changePasswordValidator = {
     body: Joi.object().keys({
-        token: Joi.string()
-            .pattern(/^(?=.*\d)(?=.*[!@#\$%\^&\*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/)
-            .min(35)
-            .required(),
+        token: Joi.string().required(),
         password: Joi.string()
             .pattern(/^(?=.*\d)(?=.*[!@#\$%\^&\*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/)
             .min(8)
@@ -63,4 +57,4 @@ const deleteUser = {
     })
 };
 
-export { loginValidator, registrationValidator, forgotPasswordValidator, changePasswordValidator, deleteUser, verifyUserEmail };
+export { loginValidator, registrationValidator, emailValidator, changePasswordValidator, deleteUser, tokenValidator };

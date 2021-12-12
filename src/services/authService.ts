@@ -50,6 +50,10 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             throw new ApiError(401, 'Email or password is incorrect');
         }
 
+        if (!user.isVerified) {
+            throw new ApiError(406, 'Please verify your email');
+        }
+
         const isValidPassword = await bcrypt.compare(data.password, user.password);
 
         if (!isValidPassword) {
@@ -72,8 +76,6 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         const details: any = await { user, token };        
 
         return details;
-        // res.send(details);
-
         // return JSON.parse(JSON.stringify(user));
     } catch (err: any) {
         throw new ApiError(err.statusCode || 500, err.message || err);
@@ -141,9 +143,9 @@ export const remove = async (userId: string): Promise<void> => {
 export const sendVerificationMail = async (req: Request, res: Response) => {
     try {        
         
-        const data: any = req.body;        
+        const { email }: { email: string } = req.body; 
         
-        const user: IUser | null = await User.findOne({ email: data.email });        
+        const user: IUser | null = await User.findOne({ email });        
         
         if (!user) {    
             throw new ApiError(404, 'User not found');
@@ -153,14 +155,7 @@ export const sendVerificationMail = async (req: Request, res: Response) => {
             throw new ApiError(406, 'User already verified');
         }
 
-        const encryptedToken = await bcrypt.hash(user._id.toString(), 8);          
-
-        let userData = {
-            id: user._id,
-            firstname: user.firstname,
-            lastname: user.lastname,
-            email: user.email
-        };  
+        const encryptedToken = await bcrypt.hash(user._id.toString(), 8);      
         
         const jwttoken = await createToken(user.id, '60m');
 
@@ -176,10 +171,9 @@ export const sendVerificationMail = async (req: Request, res: Response) => {
 
         await user.updateOne({ $set: { token: encryptedToken } });     
 
-        const email:string = `Preview URL: %s ${nodemailer.getTestMessageUrl(info)}`
-        console.log('message is: ', email);
+        const emailMessage:string = `Preview URL: %s ${nodemailer.getTestMessageUrl(info)}`
 
-        return email;
+        return emailMessage;
         
         // return JSON.parse(JSON.stringify(user));
         // res.json({
@@ -192,15 +186,13 @@ export const sendVerificationMail = async (req: Request, res: Response) => {
 
 export const verifyUserMail = async (req:Request, res:Response) => {
     try {
-        const data:any = req.body;
-        console.log('data is: ', data);
-        
-        const decodedToken: any = await verifyToken(data.token);
-        console.log('i will work');
-        console.log('decodedToken is: ', decodedToken);
+        const { token }: { token: string } = req.body;
+        if (!token) {
+            throw new ApiError(401, 'No token provided');
+        }
+
+        const decodedToken: any = await verifyToken(token);
         const user = await User.findById(decodedToken.data);
-        console.log('user is: ', user);
-        
 
         if (!user) {
             throw new ApiError(401, 'Token is invalid');
@@ -210,9 +202,6 @@ export const verifyUserMail = async (req:Request, res:Response) => {
             $set: { isVerified: true },
             $unset: { token: 0 }
         });
-
-        // res.json({ message: 'Email Verified!' });
-        let message: 'Email Verified!';
     } catch (error) {
         throw new ApiError(401, 'Token is invalid');
     }
@@ -231,18 +220,17 @@ export const sendForgotPasswordMail = async (req:Request, res:Response) => {
         const token: string = await createToken(user.id, '60m');        
 
         let info = await transporter.sendMail({
-            from: '"Fred Foo 👻" <anshuraj@dosomecoding.com>', // sender address
+            from: '"Fred Foo 👻" <admin@clicka.com>', // sender address
             to: `${email}`, // list of receivers
             subject: 'For Forgot Password Verification Mail', // Subject line
             // text: "Hello world?", // plain text body
             html: `Your Verification for forgot password Link <a href="${FRONTENDURL}/forgot-password-verify/${token}">Link</a>` // html body
         });
 
-        await user.updateOne({ $set: { verifyToken: encryptedToken } });
+        await user.updateOne({ $set: { token: encryptedToken } });
 
-        res.json({
-            message: `Preview URL: %s ${nodemailer.getTestMessageUrl(info)}`
-        });
+        const emailMessage = `Preview URL: %s ${nodemailer.getTestMessageUrl(info)}`
+        return emailMessage;
     } catch (error: any) {
         throw new ApiError(error.statusCode || 500, error.message || error);
     }
@@ -251,21 +239,76 @@ export const verifyForgotMail = async (req:Request, res:Response) => {
     const { token, password }: { token: string; password: string } = req.body;
 
     try {
-        const decodedToken: any = verifyToken(token);
+        const decodedToken: any = await verifyToken(token);
 
-        const user = await User.findById(decodedToken.userId);
+        console.log('decodedToken: ', decodedToken);
+        
+
+        const user = await User.findById(decodedToken.data);
+
         if (!user) {
             throw new ApiError(401, 'Token is invalid');
         }
 
-        const encryptedPassword = await bcrypt.hash(password, 8);
+        const encryptedPassword:string = await bcrypt.hash(password, 8);
 
         await user.updateOne({
             $set: { password: encryptedPassword },
-            $unset: { verifyToken: 0 }
+            $unset: { token: 0 }
         });
 
         res.json({ message: 'Password Changed!' });
+    } catch (error) {
+        throw new ApiError(401, 'Token is invalid');
+    }
+};
+
+export const sendForgotPasswordVerificationMail = async (req: Request, res: Response) => {
+    const { email }: { email: string } = req.body;
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            throw new ApiError(404, 'Email is not valid');
+        }
+
+        const encryptedToken = await bcrypt.hash(user._id.toString(), 8);
+
+        const token: string = await createToken(user.id, '60m');
+
+        let info = await transporter.sendMail({
+            from: '"Fred Foo 👻" <admin@clicka.com>', // sender address
+            to: `${email}`, // list of receivers
+            subject: 'For Forgot Password Verification Mail', // Subject line
+            // text: "Hello world?", // plain text body
+            html: `Your Verification for forgot password Link <a href="${FRONTENDURL}/forgot-password-verify/${token}">Link</a>` // html body
+        });
+
+        await user.updateOne({ $set: { token: encryptedToken } });
+
+        const emailMessage = `Preview URL: %s ${nodemailer.getTestMessageUrl(info)}`;
+        return emailMessage;
+    } catch (error: any) {
+        throw new ApiError(error.statusCode || 500, error.message || error);
+    }
+};
+export const verifyForgotPassword = async (req: Request, res: Response) => {
+    const { token, password }: { token: string; password: string } = req.body;
+
+    try {
+        const decodedToken: any = await verifyToken(token);
+
+        const user = await User.findById(decodedToken.data);
+
+        if (!user) {
+            throw new ApiError(401, 'Token is invalid');
+        }
+
+        const encryptedPassword: string = await bcrypt.hash(password, 8);
+
+        await user.updateOne({
+            $set: { password: encryptedPassword },
+            $unset: { token: 0 }
+        });
     } catch (error) {
         throw new ApiError(401, 'Token is invalid');
     }

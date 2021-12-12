@@ -26,14 +26,14 @@ Run `npm run test` in the terminal to run the tests.
 
 ## Project links
 - [GitHub](https://github.com/Odumz/clickaAPI.git)
-- [Swagger Documentation](https://clicka.herokuapp.com/api-docs)
-- [Demo](https://clicka.herokuapp.com)
+- [Swagger Documentation](https://clicka-be.herokuapp.com/api-docs)
+- [Demo](https://clicka-be.herokuapp.com/
 - [Front-end Demo](https://clicka.vercel.app/)
 - [Postman](https://www.getpostman.com/collections/d01055eb12328d0cfc15)
 
 ### How to use the Swagger Documentation
 #### Live Documenation
- - Click on [this link](https://clicka.herokuapp.com/api-docs) to open the hosted swagger documentation
+ - Click on [this link](https://clicka-be.herokuapp.com/api-docs) to open the hosted swagger documentation
  - Change the schemes to `https` and click on `Try it out` to execute the request
 
 #### Local Documenation
@@ -53,6 +53,6 @@ Postman environment variables:
  {{ AUTH_API }} : http://localhost:5000/api/v1/auth //or PORT/api/v1/auth - local api url for development
  {{ USER_API }} : http://localhost:5000/api/v1/user //or PORT/api/v1/user - local api url for development
  {{ PLANS_API }} : http://localhost:5000/api/v1/userplan //or PORT/api/v1/userplan - local api url for development
- {{ LURL }} : https://clicka.herokuapp.com - live url for development
- {{ LURL_API }} : https://clicka.herokuapp.com/api/v1 - live api url for development
+ {{ LURL }} : https://clicka-be.herokuapp.com/- live url for development
+ {{ LURL_API }} : https://clicka-be.herokuapp.com/api/v1 - live api url for development
  ```

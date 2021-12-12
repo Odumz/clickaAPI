@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import userplanService from '../services/userplanService';
+import { create, edit, listAll, listOne, remove } from '../services/userplanService';
 import catchAsync from '../helpers/catchAsync';
 import pick from '../helpers/pick';
 
@@ -14,7 +14,7 @@ const testCheck = (req: Request, res: Response) => {
 const getAllUserPlans = catchAsync(async (req: Request, res: Response) => {
     const options = pick(req.query, ['sortBy']);
     const filter = pick(req.query, ['name', 'features', 'price']);
-    const userplans = await userplanService.listAll(options, filter);
+    const userplans = await listAll(options, filter);
     const count = await userplans.length;
     res.status(200).send({
         status: 'success',
@@ -28,7 +28,7 @@ const getAllUserPlans = catchAsync(async (req: Request, res: Response) => {
 
 // get userplan by ID route controller definition
 const getUserPlanByID = catchAsync(async (req: Request, res: Response) => {
-    const userplan = await userplanService.listOne(req.params.id);
+    const userplan = await listOne(req.params.id);
 
     res.status(200).send({
         status: 'success',
@@ -41,7 +41,7 @@ const getUserPlanByID = catchAsync(async (req: Request, res: Response) => {
 
 // add a userplan route controller definition
 const createUserPlan = catchAsync(async (req: Request, res: Response) => {
-    const userplan = await userplanService.create(req);
+    const userplan = await create(req);
 
     res.status(201).send({
         message: 'User plan successfully created',
@@ -51,7 +51,7 @@ const createUserPlan = catchAsync(async (req: Request, res: Response) => {
 
 // update a userplan route controller definition
 const updateUserPlan = catchAsync(async (req: Request, res: Response) => {
-    const updatedUserPlan = await userplanService.edit(req.params.id, req);
+    const updatedUserPlan = await edit(req.params.id, req);
 
     res.status(200).send({
         message: 'User plan successfully updated',
@@ -61,7 +61,7 @@ const updateUserPlan = catchAsync(async (req: Request, res: Response) => {
 
 // delete a userplan route controller definition
 const deleteUserPlan = catchAsync(async (req: Request, res: Response) => {
-    const deletedUserPlan = await userplanService.remove(req.params.id);
+    const deletedUserPlan = await remove(req.params.id);
 
     res.status(200).send({
         message: 'User plan successfully deleted'

@@ -80,9 +80,9 @@ const listOne = async (criteria: string): Promise<void> => {
     }
 };
 
-const edit = async (userId: string, req: any): Promise<void> => {
+const edit = async (userplanId: string, req: any): Promise<void> => {
     try {
-        let userplan: IUserPlan | null = await UserPlan.findByIdAndUpdate(userId, req.body);
+        let userplan: IUserPlan | null = await UserPlan.findByIdAndUpdate(userplanId, req.body);
 
         if (!userplan) {
             throw new ApiError(404, 'User plan not found');
@@ -110,7 +110,7 @@ const remove = async (userId: string): Promise<void> => {
     }
 };
 
-export default {
+export {
     create,
     edit,
     listAll,

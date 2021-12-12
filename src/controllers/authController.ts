@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, RequestHandler } from 'express';
-import { register, login, forgetPassword, editPassword, sendVerificationMail, verifyUserMail, sendForgotPasswordVerificationMail, verifyForgotPassword } from '../services/authService';
+import { register, login, sendVerificationMail, verifyUserMail, sendForgotPasswordVerificationMail, verifyForgotPassword, remove, changeEmail } from '../services/authService';
 import catchAsync from '../helpers/catchAsync';
 import pick from '../helpers/pick';
 
@@ -30,23 +30,12 @@ const loginUser: RequestHandler = catchAsync(async (req: Request, res: Response)
     });
 });
 
-// update a client route controller definition
-const changePassword: RequestHandler = catchAsync(async (req: Request, res: Response) => {
-    const user:any = await editPassword(req, res);
-
-    res.status(200).send({
-        message: 'User successfully logged in',
-        ...user
-    });
-});
-
 // delete a client route controller definition
-const forgotPassword: RequestHandler = catchAsync(async (req: Request, res: Response) => {
-    const user: any = await forgetPassword(req, res);
+const removeUser: RequestHandler = catchAsync(async (req: Request, res: Response) => {
+    const user: any = await remove(req.params.id);
 
     res.status(200).send({
-        message: 'Client successfully deleted',
-        user
+        message: 'User successfully deleted'
     });
 });
 
@@ -88,4 +77,14 @@ const ForgotPasswordVerification: RequestHandler = catchAsync(async (req: Reques
     });
 });
 
-export { testCheck, changePassword, registerUser, loginUser, forgotPassword, sendMailVerification, mailVerification, sendForgotPasswordVerification, ForgotPasswordVerification };
+// edit email 
+const editEmail: RequestHandler = catchAsync(async (req: Request, res: Response) => {
+    const user: any = await changeEmail(req, res);
+
+    res.status(200).send({
+        message: 'User email successfully updated',
+        user
+    });
+});
+
+export { testCheck, registerUser, loginUser, removeUser, sendMailVerification, mailVerification, sendForgotPasswordVerification, ForgotPasswordVerification, editEmail };

@@ -82,50 +82,6 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
-export const forgetPassword = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const data = req.body;
-
-    // 
-
-        const user = await User.findOne({ email: data.email });
-
-        // const user: IUser | null = await User.findById(criteria).select('firstname lastname email phone');
-
-        if (!user) {
-            throw new ApiError(404, 'User not found');
-        }
-
-        const token = await randomStringGenerator(35);
-        
-        
-
-        // return JSON.parse(JSON.stringify(user));
-    } catch (error: any) {
-        throw new ApiError(error.statusCode || 500, error.message || error);
-    }
-};
-
-export const editPassword = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const data = req.body;
-        
-
-        // const user = await User.findOne({ email: data.email });
-
-        // const user: IUser | null = await User.findById(criteria).select('firstname lastname email phone');
-
-        // if (!user) {
-        //     throw new ApiError(404, 'User not found');
-        // }
-        
-
-        // return JSON.parse(JSON.stringify(user));
-    } catch (error: any) {
-        throw new ApiError(error.statusCode || 500, error.message || error);
-    }
-};
-
 export const remove = async (userId: string): Promise<void> => {
     try {
         let user: IUser | null = await User.findByIdAndRemove(userId);
@@ -179,6 +135,34 @@ export const sendVerificationMail = async (req: Request, res: Response) => {
         // res.json({
         //     message: `Preview URL: %s ${nodemailer.getTestMessageUrl(info)}`
         // });
+    } catch (error: any) {
+        throw new ApiError(error.statusCode || 500, error.message || error);
+    }
+};
+
+export const changeEmail = async (req: Request, res: Response) => {
+    try {
+        const { previousemail, newemail }: { previousemail: string; newemail: string } = req.body;
+
+        const user: IUser | null = await User.findOne({ previousemail });
+
+        if (!user) {
+            throw new ApiError(404, 'User not found');
+        }
+
+        if (!user.isVerified) {
+            throw new ApiError(406, 'User is not yet verified');
+        }
+
+        const newMailCheck: IUser | null = await User.findOne({ newemail });
+
+        if (newMailCheck) {
+            throw new ApiError(409, 'User already exists');
+        }
+
+        await user.updateOne({ $set: { email: newemail } });
+
+        return JSON.parse(JSON.stringify(user.email));
     } catch (error: any) {
         throw new ApiError(error.statusCode || 500, error.message || error);
     }

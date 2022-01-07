@@ -1,5 +1,5 @@
 {
-  "name": "clicka",
+  "name": "clickaAPI",
   "version": "1.0.0",
   "description": "clicka backend - to manage a communication application",
   "main": "src/app.ts",

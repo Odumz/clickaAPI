@@ -11,14 +11,14 @@ const testCheck:RequestHandler = (req: Request, res: Response) => {
 };
 
 // get all clients with conditions route controller definition
-const getAllClients:RequestHandler = catchAsync(async (req: Request, res: Response) => {
+const getAllUsers:RequestHandler = catchAsync(async (req: Request, res: Response) => {
     const options = pick(req.query, ['sortBy']);
     const filter = pick(req.query, ['name', 'email', 'phone']);
     const clients:any = await userService.listAll(options, filter);
     const count = await clients.length;
     res.status(200).send({
         status: 'success',
-        message: 'Clients successfully fetched',
+        message: 'Users successfully fetched',
         data: {
             count,
             clients
@@ -27,12 +27,12 @@ const getAllClients:RequestHandler = catchAsync(async (req: Request, res: Respon
 });
 
 // get client by ID route controller definition
-const getClientByID:RequestHandler = catchAsync(async (req: Request, res: Response) => {
+const getUserByID:RequestHandler = catchAsync(async (req: Request, res: Response) => {
     const client = await userService.listOne(req.params.id);
 
     res.status(200).send({
         status: 'success',
-        message: 'Client successfully fetched',
+        message: 'User successfully fetched',
         data: {
             client
         }
@@ -40,39 +40,39 @@ const getClientByID:RequestHandler = catchAsync(async (req: Request, res: Respon
 });
 
 // add a client route controller definition
-const createClient:RequestHandler = catchAsync(async (req: Request, res: Response) => {
+const createUser:RequestHandler = catchAsync(async (req: Request, res: Response) => {
     const client = await userService.create(req);
 
     res.status(201).send({
-        message: 'Client successfully created',
+        message: 'User successfully created',
         client
     });
 });
 
 // update a client route controller definition
-const updateClient:RequestHandler = catchAsync(async (req: Request, res: Response) => {
-    const updatedClient = await userService.edit(req.params.id, req);
+const updateUser:RequestHandler = catchAsync(async (req: Request, res: Response) => {
+    const updatedUser = await userService.edit(req.params.id, req);
 
     res.status(200).send({
-        message: 'Client successfully updated',
-        updatedClient
+        message: 'User successfully updated',
+        updatedUser
     });
 });
 
 // delete a client route controller definition
-const deleteClient:RequestHandler = catchAsync(async (req: Request, res: Response) => {
-    const deletedClient = await userService.remove(req.params.id);
+const deleteUser:RequestHandler = catchAsync(async (req: Request, res: Response) => {
+    const deletedUser = await userService.remove(req.params.id);
 
     res.status(200).send({
-        message: 'Client successfully deleted'
+        message: 'User successfully deleted'
     });
 });
 
 export {
     testCheck,
-    getAllClients,
-    createClient,
-    getClientByID,
-    updateClient,
-    deleteClient
+    getAllUsers,
+    createUser,
+    getUserByID,
+    updateUser,
+    deleteUser
 };

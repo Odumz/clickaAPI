@@ -16,7 +16,7 @@ const registerUser: RequestHandler = catchAsync(async (req: Request, res: Respon
 
     res.status(201).send({
         message: 'User successfully created',
-        ...user
+        user
     });
 });
 

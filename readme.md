@@ -27,7 +27,7 @@ Run `npm run test` in the terminal to run the tests.
 ## Project links
 - [GitHub](https://github.com/Odumz/clickaAPI.git)
 - [Swagger Documentation](https://clicka-be.herokuapp.com/api-docs)
-- [Demo Link](https://clicka-be.herokuapp.com/
+- [Demo Link](https://clicka-be.herokuapp.com/)
 - [Front-end Demo](https://clicka.vercel.app/)
 - [Postman](https://www.getpostman.com/collections/d01055eb12328d0cfc15)
 
@@ -51,11 +51,11 @@ Postman environment variables:
  {{ URL }} : http://localhost:5000 //or PORT - local url for development
  {{ URL_API }} : http://localhost:5000/api/v1 //or PORT/api/v1 - local api url for development
  {{ AUTH_API }} : http://localhost:5000/api/v1/auth //or PORT/api/v1/auth - local api url for development
- {{ USER_API }} : http://localhost:5000/api/v1/user //or PORT/api/v1/user - local api url for development
- {{ PLANS_API }} : http://localhost:5000/api/v1/userplan //or PORT/api/v1/userplan - local api url for development
+ {{ USER_API }} : http://localhost:5000/api/v1/users //or PORT/api/v1/users - local api url for development
+ {{ PLANS_API }} : http://localhost:5000/api/v1/userplans //or PORT/api/v1/userplans - local api url for development
  {{ LURL }} : https://clicka-be.herokuapp.com/- live url for development
  {{ URL_LAPI }} : https://clicka-be.herokuapp.com/api/v1 - live api url for development
  {{ AUTH_LAPI }} : https://clicka-be.herokuapp.com/api/v1/auth // auth - live api url for development
- {{ USER_LAPI }} : https://clicka-be.herokuapp.com/api/v1/user // user - live api url for development
- {{ PLANS_LAPI }} : https://clicka-be.herokuapp.com/api/v1/userplan // userplan - live api url for development
+ {{ USER_LAPI }} : https://clicka-be.herokuapp.com/api/v1/users // user - live api url for development
+ {{ PLANS_LAPI }} : https://clicka-be.herokuapp.com/api/v1/userplans // userplan - live api url for development
  ```

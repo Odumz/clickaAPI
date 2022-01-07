@@ -28,13 +28,13 @@ const getAllUsers:RequestHandler = catchAsync(async (req: Request, res: Response
 
 // get client by ID route controller definition
 const getUserByID:RequestHandler = catchAsync(async (req: Request, res: Response) => {
-    const client = await userService.listOne(req.params.id);
+    const user = await userService.listOne(req.params.id);
 
     res.status(200).send({
         status: 'success',
         message: 'User successfully fetched',
         data: {
-            client
+            user
         }
     });
 });
